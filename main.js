@@ -1,9 +1,9 @@
 const form = document.getElementById("vocabform");
 const input = document.getElementById("vocabinput");
 const list = document.getElementById("wordlist");
+const words = JSON.parse(localStorage.getItem("words")) || [];
 
-const words = [];
-
+words.forEach(renderWord);
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const word = input.value.trim();
@@ -17,23 +17,39 @@ form.addEventListener("submit", async function (e) {
     alert("Failed to fetch definition. Check your API key or browser console.");
     return;
   }
-
-  words.push(word);
-  const li = document.createElement("li");
-  li.innerHTML = li.innerHTML = `
-    <h2>${word}</h2>
-    <p><strong>Part of Speech:</strong> ${result.partOfSpeech}</p>
-    <p><strong>Definition:</strong> ${result.definition}</p>
-    <p><strong>Example:</strong> ${result.example}</p>
-    <p><strong>Synonyms:</strong> ${result.synonyms.join(", ")}</p>
-    <p><strong>Antonyms:</strong> ${result.antonyms.join(", ")}</p>
-`;
-
-  list.appendChild(li);
+  const wordData = {
+    word,
+    ...result,
+  };
+  words.push(wordData);
+  saveWords();
+  renderWord(wordData);
   input.value = "";
   input.focus();
 });
 
+function renderWord(data) {
+  const li = document.createElement("li");
+
+  const synonyms = Array.isArray(data.synonyms)
+    ? data.synonyms.join(", ")
+    : "-";
+  const antonyms = Array.isArray(data.antonyms)
+    ? data.antonyms.join(", ")
+    : "-";
+  li.innerHTML = `
+    <h2>${data.word}</h2>
+    <p><strong>Part of Speech:</strong> ${data.partOfSpeech || "-"}</p>
+    <p><strong>Definition:</strong> ${data.definition || "-"}</p>
+    <p><strong>Example:</strong> ${data.example || "-"}</p>
+    <p><strong>Synonyms:</strong> ${synonyms}</p>
+    <p><strong>Antonyms:</strong> ${antonyms}</p>
+  `;
+  list.appendChild(li);
+}
+function saveWords() {
+  localStorage.setItem("words", JSON.stringify(words));
+}
 async function getDefinition(word) {
   try {
     const response = await fetch(
@@ -51,24 +67,8 @@ async function getDefinition(word) {
           messages: [
             {
               role: "system",
-              content: `
-You are an SAT English tutor.
-For the SAT vocabulary word "${word}", return ONLY valid JSON in this format:
-{
-  "definition": "",
-  "example": "",
-  "synonyms": [],
-  "antonyms": [],
-  "partOfSpeech": ""
-}
-Rules:
-- Definition should be SAT-level, not dictionary-style.
-- easyMeaning should be easy English.
-- whyItMatters explains when this word appears on the SAT.
-- satExample should sound like a real SAT sentence.
-- difficulty is from 1 to 5.
-- mnemonic should help memorize the word.
-`,
+              content:
+                "You are an SAT English tutor. Always respond with valid JSON.",
             },
             {
               role: "user",
@@ -76,23 +76,11 @@ Rules:
 Return ONLY valid JSON in this format:
 {
   "definition": "",
-  "easyMeaning": "",
   "example": "",
   "synonyms": [],
   "antonyms": [],
   "partOfSpeech": ""
-}
-The partOfSpeech must be one of:
-- Noun
-- Verb
-- Adjective
-- Adverb
-- Pronoun
-- Preposition
-- Conjunction
-- Interjection
-- Determiner
-`,
+}`,
             },
           ],
         }),
