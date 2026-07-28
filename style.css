@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+  font-family: "EB Garamond", Georgia, serif;
+  background-color: rgb(10, 10, 10);
+  color: white;
+  padding: 50px;
+}
+:root {
+  --border-radius: 15px;
+}
+.container {
+  width: min(1400px, 95%);
+  margin: auto;
+}
+h1 {
+  text-align: center;
+  background-color: rgba(234, 236, 238, 0.158);
+  padding: 15px;
+  border-radius: var(--border-radius);
+}
+.vocabform {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.vocabinput {
+  flex: 1;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+.vocabform button {
+  padding: 20px;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+.vocabform button:hover {
+  background: rgba(202, 202, 202, 0.08);
+  transition: 0.2s;
+}
+.vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px);
+}
+.vocab-table thead {
+  background: rgba(255, 255, 255, 0.12);
+}
+.vocab-table th {
+  padding: 25px;
+  text-align: center;
+  font-size: 18px;
+}
+.vocab-table td {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  line-height: 1.6;
+  font-size: 17px;
+}
+.vocab-table tbody tr {
+  transition: 0.2s;
+}
+.vocab-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.deleteBtn {
+  background-color: #d3949448;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.deleteBtn:hover {
+  background-color: #a06c6c9a;
+}

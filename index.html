@@ -7,13 +7,31 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="conatiner">
+    <div class="container">
       <h1>SAT VOCAB</h1>
-      <form id="vocabform">
-        <input type="text" id="vocabinput" placeholder="Enter Your New Word" />
+      <form id="vocabform" class="vocabform">
+        <input
+          type="text"
+          id="vocabinput"
+          placeholder="Enter Your New Word"
+          class="vocabinput"
+        />
         <button type="submit">Add</button>
       </form>
-      <ul id="wordlist"></ul>
+      <table class="vocab-table">
+        <thead>
+          <tr>
+            <th>Word</th>
+            <th>Type</th>
+            <th>Definition</th>
+            <th>Example</th>
+            <th>Synonyms</th>
+            <th>Antonyms</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="wordlist"></tbody>
+      </table>
     </div>
   </body>
   <script src="config.js"></script>

@@ -1,6 +1,7 @@
 const form = document.getElementById("vocabform");
 const input = document.getElementById("vocabinput");
 const list = document.getElementById("wordlist");
+const deleteBtn = document.getElementById("deleteBtn");
 const words = JSON.parse(localStorage.getItem("words")) || [];
 
 words.forEach(renderWord);
@@ -8,15 +9,15 @@ form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const word = input.value.trim();
   if (!word) return;
-  const loadingLi = document.createElement("li");
-  loadingLi.textContent = `Fetching definition for "${word}"...`;
-  list.appendChild(loadingLi);
+  const loadingRow = document.createElement("tr");
+  loadingRow.innerHTML = `
+<td colspan="7">"${word}"...</td>
+`;
+
+  list.appendChild(loadingRow);
+
   const result = await getDefinition(word);
-  list.removeChild(loadingLi);
-  if (!result) {
-    alert("Failed to fetch definition. Check your API key or browser console.");
-    return;
-  }
+  list.removeChild(loadingRow);
   const wordData = {
     word,
     ...result,
@@ -29,27 +30,64 @@ form.addEventListener("submit", async function (e) {
 });
 
 function renderWord(data) {
-  const li = document.createElement("li");
+  const row = document.createElement("tr");
+  const synonyms =
+    Array.isArray(data.synonyms) && data.synonyms.length > 0
+      ? data.synonyms.join(", ")
+      : "-";
+  const antonyms =
+    Array.isArray(data.antonyms) && data.antonyms.length > 0
+      ? data.antonyms.join(", ")
+      : "-";
+  row.innerHTML = `
+<td>${data.word}</td>
 
-  const synonyms = Array.isArray(data.synonyms)
-    ? data.synonyms.join(", ")
-    : "-";
-  const antonyms = Array.isArray(data.antonyms)
-    ? data.antonyms.join(", ")
-    : "-";
-  li.innerHTML = `
-    <h2>${data.word}</h2>
-    <p><strong>Part of Speech:</strong> ${data.partOfSpeech || "-"}</p>
-    <p><strong>Definition:</strong> ${data.definition || "-"}</p>
-    <p><strong>Example:</strong> ${data.example || "-"}</p>
-    <p><strong>Synonyms:</strong> ${synonyms}</p>
-    <p><strong>Antonyms:</strong> ${antonyms}</p>
-  `;
-  list.appendChild(li);
+<td>
+    <span class="type-badge">
+        ${data.partOfSpeech}
+    </span>
+</td>
+
+<td>${data.definition}</td>
+
+<td>${data.example}</td>
+
+<td>${synonyms}</td>
+
+<td>${antonyms}</td>
+
+<td>
+    <button class="deleteBtn">
+        Delete
+    </button>
+</td>
+`;
+  const removeBtn = row.querySelector(".deleteBtn");
+  removeBtn.addEventListener("click", function () {
+    const index = words.findIndex((item) => item.word === data.word);
+    if (index !== -1) {
+      words.splice(index, 1);
+      saveWords();
+    }
+    row.remove();
+  });
+
+  list.appendChild(row);
 }
+
 function saveWords() {
   localStorage.setItem("words", JSON.stringify(words));
 }
+deleteBtn.addEventListener("click", function () {
+  if (words.length === 0) return;
+
+  if (confirm("Are you sure you want to delete all saved words?")) {
+    words.length = 0;
+    saveWords();
+    list.innerHTML = "";
+  }
+});
+
 async function getDefinition(word) {
   try {
     const response = await fetch(
@@ -86,6 +124,7 @@ Return ONLY valid JSON in this format:
         }),
       },
     );
+
     const data = await response.json();
     if (!response.ok) {
       console.error("Groq API Error:", data);
