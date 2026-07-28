@@ -87,3 +87,6 @@ h1 {
 .deleteBtn:hover {
   background-color: #a06c6c9a;
 }
+.vocab-table {
+  overflow-x: auto;
+}
