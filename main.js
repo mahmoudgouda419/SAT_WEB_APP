@@ -202,3 +202,76 @@ animPlaceholder();
 function savefavorites() {
   localStorage.setItem("favorite", JSON.stringify(favorites));
 }
+
+
+const questionCount = document.getElementById("questionCount");
+const generateQuestionsBtn = document.getElementById("generateQuestions");
+
+generateQuestionsBtn.addEventListener("click", async function () {
+
+  if (favorites.length === 0) {
+    alert("No favourite words found.");
+    return;
+  }
+
+  const count = questionCount.value;
+  let selectedWords;
+
+  if (count === "all") {
+    selectedWords = [...favorites];
+  } else {
+    selectedWords = [...favorites].sort(() => Math.random() - 0.5).slice(0, Number(count));
+  }
+
+  const quiz = await generateQuestions(selectedWords);
+  console.log(quiz);
+})
+
+async function generateQuestions(words) {
+  try {
+    const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.4,
+            response_format: { type: "json_object" },
+            messages: [
+              {
+                role: "system",
+                content: "You are an expert SAT English tutor. Always respond in valid JSON format.",
+              },
+              {
+                role: "user",
+                content: `Generate SAT Digital Reading & Writing Word in Context questions for these vocabulary words:
+                ${words.map((w) => w.word).join(", ")}
+                Return ONLY valid JSON in this format:
+                {
+                "questions":[
+                  {
+                    "word":"",
+                    "question":"",
+                    "choices":["","","",""],
+                    "correct":0,
+                    "explanation":""
+                  }
+                ]
+              }
+              `,
+              },
+            ],
+          }),
+        },
+    );
+    const data = await response.json();
+    return JSON.parse(data.choices[0].message.content);
+  } catch (err) {
+    console.error(err);
+      return null;
+  }
+}
+
