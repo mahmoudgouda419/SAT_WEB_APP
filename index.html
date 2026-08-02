@@ -18,20 +18,45 @@
         />
         <button type="submit">Add</button>
       </form>
-      <table class="vocab-table">
-        <thead>
-          <tr>
-            <th>Word</th>
-            <th>Type</th>
-            <th>Definition</th>
-            <th>Example</th>
-            <th>Synonyms</th>
-            <th>Antonyms</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody id="wordlist"></tbody>
-      </table>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="vocab">
+          Vocabulary
+        </button>
+        <button class="tab-btn active" data-tab="practice">
+          Practice
+        </button>
+      </div>
+      <section id="vocab" class="tab-content active">
+        <div class="filter">
+          <button id="all" class="filter-btn">All</button>
+          <button id="favoriteFillter" class="filter-btn">Favorites</button>
+        </div>
+        <table class="vocab-table">
+          <thead>
+            <tr>
+              <th>Word</th>
+              <th>Type</th>
+              <th>Definition</th>
+              <th>Example</th>
+              <th>Synonyms</th>
+              <th>Antonyms</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody id="wordlist"></tbody>
+        </table>
+      </section>
+
+      <section id="practice" class="tab-content">
+        <h2>Practice</h2>
+        <select id="questionCount">
+          <option>5 Q</option>
+          <option selected>10 Q</option>
+          <option>15 Q</option>
+          <option>All Favorite Q</option>
+        </select>
+        <button id="generateQustions">Generate Qustions</button>
+      </section>
     </div>
   </body>
   <script src="config.js"></script>

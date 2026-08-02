@@ -7,6 +7,7 @@ body {
 }
 :root {
   --border-radius: 15px;
+  --main-border: 1px solid rgba(184, 192, 201, 0.801);
 }
 .container {
   width: min(1400px, 95%);
@@ -17,6 +18,7 @@ h1 {
   background-color: rgba(234, 236, 238, 0.158);
   padding: 15px;
   border-radius: var(--border-radius);
+  border: var(--main-border);
 }
 .vocabform {
   display: flex;
@@ -31,8 +33,15 @@ h1 {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   color: white;
-  font-size: 15px;
+  font-size: 17px;
   outline: none;
+}
+.vocabinput:hover {
+  background: rgba(202, 202, 202, 0.08);
+}
+.vocabinput:focus {
+  background: rgba(202, 202, 202, 0.08);
+  border: 1px solid #8f8f8fc2;
 }
 .vocabform button {
   padding: 20px;
@@ -46,6 +55,7 @@ h1 {
 .vocabform button:hover {
   background: rgba(202, 202, 202, 0.08);
   transition: 0.2s;
+  border: var(--main-border);
 }
 .vocab-table {
   width: 100%;
@@ -89,4 +99,19 @@ h1 {
 }
 .vocab-table {
   overflow-x: auto;
+}
+.actiontd {
+  display: flex;
+  gap: 20px;
+}
+.actiontd .favoriteBtn {
+  background: none;
+  border: none;
+  font-size: 30px;
+  color: rgb(216, 212, 3);
+  font-weight: 600;
+}
+.actiontd .favoriteBtn:hover {
+  color: rgba(218, 165, 32, 0.712);
+  transition: 0.2s;
 }

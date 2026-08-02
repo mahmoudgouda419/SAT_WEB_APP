@@ -2,13 +2,14 @@ const form = document.getElementById("vocabform");
 const input = document.getElementById("vocabinput");
 const list = document.getElementById("wordlist");
 const words = JSON.parse(localStorage.getItem("words")) || [];
+const favorites = JSON.parse(localStorage.getItem("favorite")) || [];
 
 words.forEach(renderWord);
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const word = input.value.trim();
   if (!word) return;
-  if (!/^[a-zA-Z-]+$/.test(word)) {
+  if (!/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/.test(word)) {
     alert("Please Write a Valid Word");
     return;
   }
@@ -56,18 +57,20 @@ function renderWord(data) {
 <td>${data.word}</td>
 
 <td>
-    <span class="type-badge">
-        ${data.partOfSpeech}
-    </span>
+  <span class="type-badge">${data.partOfSpeech}</span>
 </td>
+
 <td>${data.definition}</td>
+
 <td>${data.example}</td>
+
 <td>${synonyms}</td>
+
 <td>${antonyms}</td>
-<td>
-    <button class="deleteBtn">
-        Delete
-    </button>
+
+<td class = "actiontd">
+<button class="deleteBtn">Delete</button>
+    <button class="favoriteBtn">☆</button>
 </td>
 `;
   const removeBtn = row.querySelector(".deleteBtn");
@@ -78,9 +81,32 @@ function renderWord(data) {
       saveWords();
     }
     row.remove();
-  });
 
+    const favIndex = favorites.findIndex((item) => item.word === data.word);
+
+    if (favIndex !== -1) {
+      favorites.splice(favIndex, 1);
+      savefavorites();
+    }
+  });
   list.appendChild(row);
+
+  const favoriteBtn = row.querySelector(".favoriteBtn");
+
+  if (favorites.some((item) => item.word === data.word)) {
+    favoriteBtn.textContent = "★";
+  }
+  favoriteBtn.addEventListener("click", function () {
+    const index = favorites.findIndex((item) => item.word === data.word);
+    if (index === -1) {
+      favorites.push(data);
+      favoriteBtn.textContent = "★";
+    } else {
+      favorites.splice(index, 1);
+      favoriteBtn.textContent = "☆";
+    }
+    savefavorites();
+  });
 }
 
 function saveWords() {
@@ -111,17 +137,17 @@ async function getDefinition(word) {
               role: "user",
               content: `Analyze the input: "${word}".
 
-Check if "${word}" is a real, valid English word
-(it should NOT be Arabic, pure numbers,
-gibberish, symbols, or typos). Return ONLY valid JSON:".
-Return ONLY valid JSON in this format:
-{
-  "isValid": true or false,
-  "definition": "",
-  "example": "",
-  "synonyms": [],
-  "antonyms": [],
-  "partOfSpeech": ""
+              Check if "${word}" is a real, valid English word
+              (it should NOT be Arabic, pure numbers,
+              gibberish, symbols, or typos). 
+              Return ONLY valid JSON in this format:
+              {
+                "isValid": true or false,
+                "definition": "",
+                "example": "",
+                "synonyms": [],
+                "antonyms": [],
+                "partOfSpeech": ""
 }`,
             },
           ],
@@ -172,3 +198,7 @@ function animPlaceholder() {
   setTimeout(animPlaceholder, speed);
 }
 animPlaceholder();
+
+function savefavorites() {
+  localStorage.setItem("favorite", JSON.stringify(favorites));
+}
