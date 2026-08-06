@@ -7,20 +7,20 @@ const favorites = JSON.parse(localStorage.getItem("favorite")) || [];
 words.forEach(renderWord);
 
 const allBtn = document.getElementById("all")
-const favoriteFilterBtn = document.getElementById("favoriteFilter")
-let currentFilter = "all";
+const favoriteFillterBtn = document.getElementById("favoriteFillter")
+let currentFillter = "all";
 
 allBtn.addEventListener("click", function () {
-  currentFilter = "all";
+  currentFillter = "all";
   allBtn.classList.add("active");
-  favoriteFilterBtn.classList.remove("active");
+  favoriteFillterBtn.classList.remove("active");
   list.innerHTML = "";
   words.forEach(renderWord);
-})
+});
 
-favoriteFilterBtn.addEventListener("click", function() {
-  currentFilter = "favorites";
-  favoriteFilterBtn.classList.add("active");
+favoriteFillterBtn.addEventListener("click", function () {
+  currentFillter = "favorites";
+  favoriteFillterBtn.classList.add("active");
   allBtn.classList.remove("active");
   list.innerHTML = "";
   favorites.forEach(renderWord);
@@ -125,6 +125,9 @@ function renderWord(data) {
     } else {
       favorites.splice(index, 1);
       favoriteBtn.textContent = "☆";
+      if (currentFillter === "favorites") {
+        row.remove();
+      }
     }
     savefavorites();
   });
@@ -227,6 +230,7 @@ function savefavorites() {
 
 const questionCount = document.getElementById("questionCount");
 const generateQuestionsBtn = document.getElementById("generateQuestions");
+
 
 generateQuestionsBtn.addEventListener("click", async function () {
 
