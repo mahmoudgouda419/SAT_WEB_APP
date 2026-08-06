@@ -5,6 +5,26 @@ const words = JSON.parse(localStorage.getItem("words")) || [];
 const favorites = JSON.parse(localStorage.getItem("favorite")) || [];
 
 words.forEach(renderWord);
+const allBtn = document.getElementById("all")
+const favoriteFilterBtn = document.getElementById("favoriteFilter")
+let currentFilter = "all";
+
+allBtn.addEventListener("click", (e) => {
+  currentFilter = "all";
+  allBtn.classList.add("active");
+  favoriteFilterBtn.classList.remove("active");
+  list.innerHTML = "";
+  words.forEach(renderWord);
+})
+
+favoriteFilterBtn.addEventListener("click", (e) => {
+  currentFilter = "favorites";
+  favoriteFilterBtn.classList.add("active");
+  allBtn.classList.remove("active");
+  list.innerHTML = "";
+  favorites.forEach(renderWord);
+});
+
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const word = input.value.trim();
