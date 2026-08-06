@@ -230,7 +230,23 @@ function savefavorites() {
 
 const questionCount = document.getElementById("questionCount");
 const generateQuestionsBtn = document.getElementById("generateQuestions");
+quizContainer = document.getElementById("quizContainer");
 
+const tabBtns = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabBtns.forEach((btn) => {
+  btn.addEventListener("click", function () {
+    tabBtns.forEach((b) => b.classList.remove("active"));
+    tabContents.forEach((c) => c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+let currentQuiz = [];
+let currentQuestionIndex = 0;
+let score = 0;
 
 generateQuestionsBtn.addEventListener("click", async function () {
 
@@ -248,9 +264,74 @@ generateQuestionsBtn.addEventListener("click", async function () {
     selectedWords = [...favorites].sort(() => Math.random() - 0.5).slice(0, Number(count));
   }
 
+  generateQuestionsBtn.disabled = true;
+  quizContainer.innerHTML = `<p class="quiz-loading">Generating questions...</p>`;
+
   const quiz = await generateQuestions(selectedWords);
-  console.log(quiz);
+  generateQuestionsBtn.disabled = false;
+
+  if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
+    quizContainer.innerHTML = `<p class="quiz-loading">Failed to generate, try again later.</p>`;
+    return;
+  }
+
+  currentQuiz = quiz.questions;
+  currentQuestionIndex = 0;
+  score = 0;
+  renderQuestion();
 })
+
+function renderQuestion() {
+  const total = currentQuiz.length;
+  const q = currentQuiz[currentQuestionIndex];
+
+  quizContainer.innerHTML = `
+  <div class="quiz-card">
+    <div class="quiz-header">
+        <span class="quiz-counter">Question ${currentQuestionIndex + 1} of ${total}</span>
+        <span class="quiz-word">${q.word}</span>
+    </div>
+    <div class="question-text">${q.question}</div>
+    <div class="answer"></div>
+    <div class="quiz-explanation" style="display: none"></div>
+    <button id="nextQuestion" class="nxt-btn" style="display: none">Next</button>
+  </div>
+  `;
+
+  const answerContainer = quizContainer.querySelector(".answer");
+  q.choices.forEach((choice, index) => {
+    const btn = document.createElement("button");
+    btn.className = "answer-btn";
+    btn.textContent = choice;
+    btn.addEventListener("click", function () {
+      selectAnswer(index, btn);
+    });
+    answerContainer.appendChild(btn);
+  });
+}
+
+function selectAnswer(selectedIndex, btnEl) {
+  const q = currentQuiz[currentQuestionIndex];
+  const buttons = quizContainer.querySelectorAll(".answer-btn");
+  buttons.forEach((btn) => (btn.disabled = true));
+
+  if (selectedIndex === q.correct) {
+    btnEl.classList.add("correct");
+    score++;
+  } else {
+    btnEl.classList.add("wrong");
+    buttons[q.correct].classList.add("correct");
+  }
+  const explanationEl = quizContainer.querySelector(".quiz-explanation");
+  explanationEl.textContent = q.explanation;
+  explanationEl.style.display = "block";
+
+  const nextBtn = quizContainer.querySelector("#nextQuestion");
+  nextBtn.textContent =
+      currentQuestionIndex < currentQuiz.length - 1 ? "Next" : "Finish";
+  nextBtn.style.display = "inline-block";
+  nextBtn.addEventListener("click", goToNext);
+}
 
 async function generateQuestions(words) {
   try {
