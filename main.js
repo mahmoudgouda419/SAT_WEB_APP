@@ -5,11 +5,12 @@ const words = JSON.parse(localStorage.getItem("words")) || [];
 const favorites = JSON.parse(localStorage.getItem("favorite")) || [];
 
 words.forEach(renderWord);
+
 const allBtn = document.getElementById("all")
 const favoriteFilterBtn = document.getElementById("favoriteFilter")
 let currentFilter = "all";
 
-allBtn.addEventListener("click", (e) => {
+allBtn.addEventListener("click", function () {
   currentFilter = "all";
   allBtn.classList.add("active");
   favoriteFilterBtn.classList.remove("active");
@@ -17,7 +18,7 @@ allBtn.addEventListener("click", (e) => {
   words.forEach(renderWord);
 })
 
-favoriteFilterBtn.addEventListener("click", (e) => {
+favoriteFilterBtn.addEventListener("click", function() {
   currentFilter = "favorites";
   favoriteFilterBtn.classList.add("active");
   allBtn.classList.remove("active");
