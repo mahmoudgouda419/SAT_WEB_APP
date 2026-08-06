@@ -333,6 +333,28 @@ function selectAnswer(selectedIndex, btnEl) {
   nextBtn.addEventListener("click", goToNext);
 }
 
+function goToNext() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < currentQuiz.length) {
+    renderQuestion();
+  } else {
+    renderResults()
+  }
+}
+
+function renderResults() {
+  const total = currentQuiz.length;
+  quizContainer.innerHTML = `
+  <div class="quiz-card quiz-results">
+  <h3>Quiz Complete :></h3>
+  <p>You scored ${score} out of ${total}</p>
+      <button id="restartQuiz" class="next-btn">Generate New Questions</button>
+  </div>`;
+  document.getElementById("restartQuiz").addEventListener("click", function (){
+    quizContainer.innerHTML = "";
+  });
+}
+
 async function generateQuestions(words) {
   try {
     const response = await fetch(
