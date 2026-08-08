@@ -180,6 +180,7 @@ async function getDefinition(word) {
     );
 
     const data = await response.json();
+
     if (!response.ok) {
       console.error("Groq API Error:", data);
       return null;
@@ -228,9 +229,8 @@ function savefavorites() {
 }
 
 
-const questionCount = document.getElementById("questionCount");
 const generateQuestionsBtn = document.getElementById("generateQuestions");
-quizContainer = document.getElementById("quizContainer");
+const quizContainer = document.getElementById("quizContainer");
 
 const tabBtns = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
@@ -254,15 +254,7 @@ generateQuestionsBtn.addEventListener("click", async function () {
     alert("No favourite words found.");
     return;
   }
-
-  const count = questionCount.value;
-  let selectedWords;
-
-  if (count === "all") {
-    selectedWords = [...favorites];
-  } else {
-    selectedWords = [...favorites].sort(() => Math.random() - 0.5).slice(0, Number(count));
-  }
+  const selectedWords = [...favorites];
 
   generateQuestionsBtn.disabled = true;
   quizContainer.innerHTML = `<p class="quiz-loading">Generating questions...</p>`;
@@ -286,16 +278,16 @@ function renderQuestion() {
   const q = currentQuiz[currentQuestionIndex];
 
   quizContainer.innerHTML = `
-  <div class="quiz-card">
-    <div class="quiz-header">
+    <div class="quiz-card">
+      <div class="quiz-header">
         <span class="quiz-counter">Question ${currentQuestionIndex + 1} of ${total}</span>
         <span class="quiz-word">${q.word}</span>
+      </div>
+      <div class="question-text">${q.question}</div>
+      <div class="answer"></div>
+      <div class="quiz-explanation" style="display:none;"></div>
+      <button id="nextQuestion" class="next-btn" style="display:none;">Next</button>
     </div>
-    <div class="question-text">${q.question}</div>
-    <div class="answer"></div>
-    <div class="quiz-explanation" style="display: none"></div>
-    <button id="nextQuestion" class="nxt-btn" style="display: none">Next</button>
-  </div>
   `;
 
   const answerContainer = quizContainer.querySelector(".answer");
@@ -338,7 +330,7 @@ function goToNext() {
   if (currentQuestionIndex < currentQuiz.length) {
     renderQuestion();
   } else {
-    renderResults()
+    renderResults();
   }
 }
 
@@ -350,8 +342,8 @@ function renderResults() {
   <p>You scored ${score} out of ${total}</p>
       <button id="restartQuiz" class="next-btn">Generate New Questions</button>
   </div>`;
-  document.getElementById("restartQuiz").addEventListener("click", function (){
-    quizContainer.innerHTML = "";
+  document.getElementById("restartQuiz").addEventListener("click", function () {
+    generateQuestionsBtn.click();
   });
 }
 
@@ -396,6 +388,10 @@ async function generateQuestions(words) {
         },
     );
     const data = await response.json();
+    if (!response.ok) {
+      console.error("Groq API Error:", data);
+      return null;
+    }
     return JSON.parse(data.choices[0].message.content);
   } catch (err) {
     console.error(err);
@@ -403,3 +399,37 @@ async function generateQuestions(words) {
   }
 }
 
+
+function validateQuestion(question) {
+  if (
+      !question.word ||
+      !Array.isArray(question.choices) ||
+      question.choices.length !== 4 ||
+      typeof question.correct !== "number" ||
+      question.correct < 0 ||
+      question.correct >= question.choices.length
+  ) {
+    return false;
+  }
+  return true;
+}
+
+const rawGenerateQuestions = generateQuestions;
+generateQuestions = async function (words) {
+  const result = await rawGenerateQuestions(words);
+  if (result && Array.isArray(result.questions)) {
+    result.questions = result.questions.filter(validateQuestion);
+  }
+  return result;
+}
+
+document.addEventListener("keydown", function (e) {
+  if (!["1","2","3","4"].includes(e.key)) return;
+  const buttons = document.querySelectorAll(
+      "#quizContainer .answer-btn:not(:disabled)",
+  );
+  const index = Number(e.key) - 1;
+  if (buttons[index]) {
+     buttons[index].click();
+  }
+});
