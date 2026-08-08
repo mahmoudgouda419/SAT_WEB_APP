@@ -263,7 +263,7 @@ generateQuestionsBtn.addEventListener("click", async function () {
   generateQuestionsBtn.disabled = false;
 
   if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
-    quizContainer.innerHTML = `<p class="quiz-loading">Failed to generate, try again later.</p>`;
+    quizContainer.innerHTML = `<p class="quiz-error">Failed to generate, try again later.</p>`;
     return;
   }
 
