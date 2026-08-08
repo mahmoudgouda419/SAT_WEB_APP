@@ -281,7 +281,6 @@ function renderQuestion() {
     <div class="quiz-card">
       <div class="quiz-header">
         <span class="quiz-counter">Question ${currentQuestionIndex + 1} of ${total}</span>
-        <span class="quiz-word">${q.word}</span>
       </div>
       <div class="question-text">${q.question}</div>
       <div class="answer"></div>
